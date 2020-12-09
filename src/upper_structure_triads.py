@@ -11,8 +11,8 @@ chordLists = {
     "13b9": ["c3", "g3", "b-3", "e4", "a4", "c#5"],
     "7#9": ["c3", "g3", "b-3", "e4", "g4", "b-4", "e-5"],
     "13#11": ["c3", "g3", "b-3", "e4", "fis4", "a4", "d5"],
-    "7#9#5": ["c3", "b-3", "e4", "a-4", "c5", "e-5"],
-    "7#11b9": ["c3", "g3", "b-3", "e4", "g-4", "b-4", "d-5"],
+    #"7#9#5": ["c3", "b-3", "e4", "a-4", "c5", "e-5"],
+    #"7#11b9": ["c3", "g3", "b-3", "e4", "g-4", "b-4", "d-5"],
     ##### major chords #####
     #"M13#11" : ["c3", "g3", "b3", "e4", "f#4", "a4", "d5"],
     #"M9" : ["c3", "g3", "b3", "e4", "a4", "d5"],
@@ -114,12 +114,16 @@ def playStreamAsMidi(stream):
     stream.show('midi')
 
 
-def playChordName(chordName, changeOctave=1):
+def playChordName(chordName, changeOctave=1, melodically=False):
     streamPlay = stream.Stream()
     pitchList = [pitch.Pitch(p) for p in chordLists[chordName]]
     for p in pitchList:
         p.octave = p.octave + changeOctave
-    chordPlay = chord.Chord(pitchList, duration=duration.Duration("whole"))
+    chordPlay = None
+    if melodically:
+        chordPlay = [note.Note(p, duration=duration.Duration("quarter")) for p in pitchList]
+    else:
+        chordPlay = chord.Chord(pitchList, duration=duration.Duration("whole"))
     streamPlay.append(chordPlay)
     playStreamAsMidi(streamPlay)
 
@@ -131,7 +135,7 @@ def startPractice():
         chordName = random.choice(list(chordLists))
         playChordName(chordName)
         while True:
-            c = input("enter chord name or [?nrhq]: ")
+            c = input("enter chord name or [?nrmhq]: ")
             if c == "?":
                 print("possible chord names", list(chordLists))
             elif c == "n":
@@ -141,6 +145,9 @@ def startPractice():
             elif c == "r":
                 print("repeat")
                 playChordName(chordName)
+            elif c == "m":
+                print("melodically")
+                playChordName(chordName, melodically=True)
             elif c == "h":
                 print("help, chord name is", chordName)
             elif c == "q":
